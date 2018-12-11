@@ -5,6 +5,7 @@
  */
 
 const puppeteer = require('puppeteer-core');
+const program = require('commander');
 
 /**
  * Starts the browser and returns the content when element appears.
@@ -17,7 +18,7 @@ async function scrap({url, selector}, sessionId = "local") {
 
     return new Promise(async (resolve, reject) => {
 
-        console.log(`[${sessionId}]`, 'starting chrome browser');
+        if (sessionId) console.log(`[${sessionId}]`, 'starting chrome browser');
         const browser = await puppeteer.launch({
             executablePath: '/opt/google/chrome/chrome',
             args: ['--no-sandbox']
@@ -28,10 +29,10 @@ async function scrap({url, selector}, sessionId = "local") {
 
         async function stop() {
             if (i) {
-                console.log(`[${sessionId}]`, 'clearing refresh interval');
+                if (sessionId) console.log(`[${sessionId}]`, 'clearing refresh interval');
                 clearInterval(i);
             }
-            console.log(`[${sessionId}]`, 'closing chrome browser');
+            if (sessionId) console.log(`[${sessionId}]`, 'closing chrome browser');
             await page.close();
             await browser.close();
         }
@@ -39,11 +40,11 @@ async function scrap({url, selector}, sessionId = "local") {
         async function check() {
             let elements = await page.$$(selector);
             if (elements.length) {
-                console.log(`[${sessionId}]`, `element with selector: '${selector}' appeared, resolving content`);
+                if (sessionId) console.log(`[${sessionId}]`, `element with selector: '${selector}' appeared, resolving content`);
                 resolve(await page.content());
                 await stop();
             } else if (++j === 25) { // 25 secs timeout
-                console.log(`[${sessionId}]`, `element with selector: '${selector}' didn't appear within 25 secs, timeout`);
+                if (sessionId) console.log(`[${sessionId}]`, `element with selector: '${selector}' didn't appear within 25 secs, timeout`);
                 reject('timeout');
                 await stop();
             }
@@ -53,23 +54,44 @@ async function scrap({url, selector}, sessionId = "local") {
         let i = null;
         page.once('load', async () => {
             if (selector) {
-                console.log(`[${sessionId}]`, `page loaded, setting 1000 ms refresh interval`);
+                if (sessionId) console.log(`[${sessionId}]`, `page loaded, setting 1000 ms refresh interval`);
                 i = setInterval(check, 1000);
             } else {
-                console.log(`[${sessionId}]`, `page loaded, resolving content immediately`);
+                if (sessionId) console.log(`[${sessionId}]`, `page loaded, resolving content immediately`);
                 resolve(await page.content());
                 await stop();
             }
         });
 
-        console.log(`[${sessionId}]`, `going to: ${url}`);
+        if (sessionId) console.log(`[${sessionId}]`, `going to: ${url}`);
         await page.goto(url);
 
     });
 
 }
 
+// exports
+
 exports.scrap = scrap;
+
+// CLI
+
+program.version('1.0.0');
+
+program
+    .command('fetch <url>')
+    .description('fetches URL')
+    .option('-s, --selector <selector>', 'returns content after appearance of element pointed by css selector')
+    .action(async function (url, cmd) {
+        let req = {url};
+        if (cmd.selector)
+            req.selector = cmd.selector;
+        console.log(await scrap(req, null));
+    });
+
+
+program.parse(process.argv);
+
 
 // direct call examples
 

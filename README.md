@@ -131,6 +131,25 @@ $ docker logs puppeteer-api
 [51b45bd7] sending data with: 1262 bytes
 ```
 
+### With command line
+
+The same options as above are accessible from command line in host OS using temporary docker container.
+
+On page load option:
+
+```
+$ docker run --rm -it --entrypoint "/bin/bash" l0coful/puppeteer-api puppeteer fetch http://example.com | grep "h1"
+<h1>Example Domain</h1>
+```
+
+On `h1` element appearance in DOM option:
+
+```
+$ docker run --rm -it --entrypoint "/bin/bash" l0coful/puppeteer-api puppeteer fetch -s "h1" http://example.com | grep "h1"
+<h1>Example Domain</h1>
+```
+
+
 ## How to build
 
 ```

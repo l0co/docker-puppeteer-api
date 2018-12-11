@@ -24,5 +24,9 @@ RUN npm i
 
 COPY resources/bootstrap-start.sh /
 RUN chmod 0755 /bootstrap-start.sh
+COPY resources/bootstrap-stop.sh /
+RUN chmod 0755 /bootstrap-stop.sh
+COPY resources/usr/local/bin/puppeteer /usr/local/bin
+RUN chmod 0755 /usr/local/bin/puppeteer
 
 EXPOSE 9222 8000

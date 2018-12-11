@@ -1,0 +1,3 @@
+#!/bin/bash
+
+node /root/puppeteer-api/puppeteer.js "$@"
