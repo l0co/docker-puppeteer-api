@@ -1,0 +1,17 @@
+{
+  "name": "puppeteer-api",
+  "version": "1.0.0",
+  "description": "Headless chrome scrapper API based on puppeteer.",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "Lukasz Frankowski (https://lifeinide.com)",
+  "license": "ISC",
+  "dependencies": {
+    "express": "^4.16.4",
+    "md5": "^2.2.1",
+    "puppeteer-core": "^1.11.0",
+    "uuid4": "^1.1.4"
+  }
+}
