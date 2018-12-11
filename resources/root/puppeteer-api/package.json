@@ -9,6 +9,7 @@
   "author": "Lukasz Frankowski (https://lifeinide.com)",
   "license": "ISC",
   "dependencies": {
+    "commander": "^2.19.0",
     "express": "^4.16.4",
     "md5": "^2.2.1",
     "puppeteer-core": "^1.11.0",
