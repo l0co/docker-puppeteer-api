@@ -54,9 +54,9 @@ POST following JSON to `http://localhost:8000/scrap`:
 
 Where:
 
-1. `url` is url to fetch
-1. `selector` is optional selector. If provided the content will be returned only after this selector returns non-empty array. Otherwise the content will be returned on page `onload` event.
-1. `hash` is request signature done by `md5(``asd``)`.
+1. `url` is the URL to fetch.
+1. `selector` is an optional selector. If provided the content will be returned only after this selector returns non-empty elements array. Otherwise the content will be returned on page `onload` event.
+1. `hash` is the request signature done by ``md5(`${url}:${SALT}`)``.
 
 ##### On page load
 
