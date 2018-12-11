@@ -1,4 +1,4 @@
-# Chrome scrapper
+# Puppeteer API
 
 Headless chrome scrapper API based on puppeteer.
 
@@ -16,7 +16,7 @@ Features:
 
 ## How to use
 
-### From REST API
+### With REST API
 
 Start docker container using following command:
 
