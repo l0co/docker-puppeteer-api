@@ -54,7 +54,7 @@ async function scrap({url, selector}, sessionId = "local") {
         let i = null, k = null;
         page.once('load', async () => {
             if (k) {
-                if (sessionId) console.log('clearing wait for page load timeout');
+                if (sessionId) console.log(`[${sessionId}]`, 'clearing wait for page load timeout');
                 clearTimeout(k);
             }
 
@@ -72,7 +72,7 @@ async function scrap({url, selector}, sessionId = "local") {
         try {
             await page.goto(url);
         } catch (e) {
-            if (sessionId) console.error(`error: ${e.message}, but continue to wait for onload yet another time`);
+            if (sessionId) console.error(`[${sessionId}]`, `error: ${e.message}, but continue to wait for onload yet another time`);
             k = setTimeout(async () => {
                 reject('pageload timeout');
                 await stop();
