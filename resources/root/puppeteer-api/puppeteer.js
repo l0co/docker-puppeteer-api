@@ -43,16 +43,21 @@ async function scrap({url, selector}, sessionId = "local") {
                 if (sessionId) console.log(`[${sessionId}]`, `element with selector: '${selector}' appeared, resolving content`);
                 resolve(await page.content());
                 await stop();
-            } else if (++j === 25) { // 25 secs timeout
+            } else if (++j === 60) { // 60 secs timeout
                 if (sessionId) console.log(`[${sessionId}]`, `element with selector: '${selector}' didn't appear within 25 secs, timeout`);
-                reject('timeout');
+                reject('element timeout');
                 await stop();
             }
 
         }
 
-        let i = null;
+        let i = null, k = null;
         page.once('load', async () => {
+            if (k) {
+                if (sessionId) console.log('clearing wait for page load timeout');
+                clearTimeout(k);
+            }
+
             if (selector) {
                 if (sessionId) console.log(`[${sessionId}]`, `page loaded, setting 1000 ms refresh interval`);
                 i = setInterval(check, 1000);
@@ -64,7 +69,15 @@ async function scrap({url, selector}, sessionId = "local") {
         });
 
         if (sessionId) console.log(`[${sessionId}]`, `going to: ${url}`);
-        await page.goto(url);
+        try {
+            await page.goto(url);
+        } catch (e) {
+            if (sessionId) console.error(`error: ${e.message}, but continue to wait for onload yet another 30s`);
+            k = setTimeout(async () => {
+                reject('pageload timeout');
+                await stop();
+            }, 30000);
+        }
 
     });
 
