@@ -44,7 +44,7 @@ async function scrap({url, selector}, sessionId = "local") {
                 resolve(await page.content());
                 await stop();
             } else if (++j === 60) { // 60 secs timeout
-                if (sessionId) console.log(`[${sessionId}]`, `element with selector: '${selector}' didn't appear within 25 secs, timeout`);
+                if (sessionId) console.log(`[${sessionId}]`, `element with selector: '${selector}' didn't appear, timeout`);
                 reject('element timeout');
                 await stop();
             }
@@ -72,7 +72,7 @@ async function scrap({url, selector}, sessionId = "local") {
         try {
             await page.goto(url);
         } catch (e) {
-            if (sessionId) console.error(`error: ${e.message}, but continue to wait for onload yet another 30s`);
+            if (sessionId) console.error(`error: ${e.message}, but continue to wait for onload yet another time`);
             k = setTimeout(async () => {
                 reject('pageload timeout');
                 await stop();
