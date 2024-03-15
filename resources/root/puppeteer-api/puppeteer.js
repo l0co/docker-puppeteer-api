@@ -26,6 +26,9 @@ async function scrap({url, selector}, sessionId = "local") {
 
         let j = 0;
         const page = await browser.newPage();
+        if (process.env.USER_AGENT) {
+            page.setUserAgent(process.env.USER_AGENT);
+        }
 
         async function stop() {
             if (i) {
