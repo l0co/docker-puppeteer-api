@@ -20,7 +20,7 @@ async function scrap({url, selector}, sessionId = "local") {
 
         if (sessionId) console.log(`[${sessionId}]`, 'starting chrome browser');
         const browser = await puppeteer.launch({
-            executablePath: '/opt/google/chrome/chrome',
+            executablePath: '/usr/bin/chromium',
             args: ['--no-sandbox']
         });
 
