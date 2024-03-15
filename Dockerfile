@@ -26,9 +26,12 @@ COPY resources/bootstrap-start.sh /
 RUN chmod 0755 /bootstrap-start.sh
 COPY resources/bootstrap-stop.sh /
 RUN chmod 0755 /bootstrap-stop.sh
+COPY resources/healthcheck.sh /
+RUN chmod 0755 /healthcheck.sh
 COPY resources/usr/local/bin/puppeteer /usr/local/bin
 RUN chmod 0755 /usr/local/bin/puppeteer
 
 ENTRYPOINT ["/bootstrap.sh"]
+HEALTHCHECK --interval=10s --timeout=5s --retries=3 CMD [ "/healthcheck.sh" ]
 
 EXPOSE 9222 8000

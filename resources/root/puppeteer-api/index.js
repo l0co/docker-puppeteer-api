@@ -4,6 +4,8 @@
  * @author Lukasz Frankowski
  */
 
+const packageInfo = require('./package.json');
+
 const uuid4 = require('uuid4');
 const express = require('express');
 const { scrap } = require('./puppeteer');
@@ -53,6 +55,14 @@ app.post('/scrap', (req, res) => {
         console.log(`[${sesionId}]`, `sending error: ${data}`);
         res.status(400).send(data);
     })
+});
+
+app.get('/status', (req, res) => {
+    let response = {
+        "status": "OK",
+        "version": packageInfo.version
+    };
+    res.send(response);
 });
 
 app.listen(PORT, () => console.log(`Scrapper API is listening on port: ${PORT}`));
