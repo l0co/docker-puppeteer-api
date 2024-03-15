@@ -8,8 +8,15 @@ const uuid4 = require('uuid4');
 const express = require('express');
 const { scrap } = require('./puppeteer');
 const md5 = require('md5');
+const fs = require('fs');
 
-const SALT = process.env.SALT || "NO-SALT";
+if (process.env.SALT || process.env.SALT_FILE) {
+    const SALT = process.env.SALT || fs.readFileSync(process.env.SALT_FILE, 'utf8');
+    console.log(`Using '${SALT}' as salt`);
+} else {
+    const SALT = "NO-SALT";
+    console.warn(`Warning: using default '${SALT}' salt, you should provide some randomly generated string as SALT environment variable`);
+}
 const PORT = 8000;
 
 const app = express();
@@ -46,11 +53,6 @@ app.post('/scrap', (req, res) => {
         res.status(400).send(data);
     })
 });
-
-if (SALT === "NO-SALT")
-    console.warn("Warning: using default 'NO_SALT' salt, you should provide some randomly generated string as SALT environment variable");
-else
-    console.log(`Using '${SALT}' as salt`);
 
 app.listen(PORT, () => console.log(`Scrapper API is listening on port: ${PORT}`));
 
