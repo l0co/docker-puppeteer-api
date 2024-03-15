@@ -10,11 +10,12 @@ const { scrap } = require('./puppeteer');
 const md5 = require('md5');
 const fs = require('fs');
 
+var SALT;
 if (process.env.SALT || process.env.SALT_FILE) {
-    const SALT = process.env.SALT || fs.readFileSync(process.env.SALT_FILE, 'utf8');
+    SALT = process.env.SALT || fs.readFileSync(process.env.SALT_FILE, 'utf8');
     console.log(`Using '${SALT}' as salt`);
 } else {
-    const SALT = "NO-SALT";
+    SALT = "NO-SALT";
     console.warn(`Warning: using default '${SALT}' salt, you should provide some randomly generated string as SALT environment variable`);
 }
 const PORT = 8000;
