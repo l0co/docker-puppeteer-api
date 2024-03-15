@@ -1,6 +1,6 @@
 {
   "name": "puppeteer-api",
-  "version": "1.0.0",
+  "version": "2.0.0",
   "description": "Headless chrome scrapper API based on puppeteer.",
   "main": "index.js",
   "scripts": {
