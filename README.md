@@ -29,6 +29,8 @@ Where:
 
 1. The container port `8000`  is bound to `8000` host port making API accessible at `http://localhost:8000` (also through the network).
 1. The `SALT` environment variable provided should be set to some random string and will be used for requests security.
+1. Alternatively, you can specify a file location to read the salt value from in the `SALT_FILE` environment variable.
+1. If you want to specify the User-Agent string to use, you can provide it in the `USER_AGENT` environment variable.
 
 You can check if everything is OK tracing container logs:
 
