@@ -1,4 +1,4 @@
-FROM alpine:latest
+FROM alpine:3.19.1
 
 ENV IMAGE_NAME puppeteer-api
 ENV IMAGE_VERSION 2.0
