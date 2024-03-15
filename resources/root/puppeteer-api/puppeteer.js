@@ -4,6 +4,8 @@
  * @author Lukasz Frankowski
  */
 
+const packageInfo = require('./package.json');
+
 const puppeteer = require('puppeteer-core');
 const program = require('commander');
 
@@ -92,7 +94,7 @@ exports.scrape = scrape;
 
 // CLI
 
-program.version('1.0.0');
+program.version(packageInfo.version);
 
 program
     .command('fetch <url>')
