@@ -1,6 +1,6 @@
 # Puppeteer API
 
-Headless chrome scrapper API based on [puppeteer](https://github.com/GoogleChrome/puppeteer).
+Headless chrome scraper API based on [puppeteer](https://github.com/GoogleChrome/puppeteer).
 
 This image contains:
 
@@ -38,14 +38,14 @@ You can check if everything is OK tracing container logs:
 $ docker logs puppeteer-api
 [...]
 Using 'abcdef' as salt
-[local] Scrapper API is listening on port: 8000
+[local] Scraper API version 2.0.0 is listening on port: 8000
 ```
 
 #### Fetching URL content
 
 ##### TL;DR
 
-POST following JSON to `http://localhost:8000/scrap`:
+POST following JSON to `http://localhost:8000/scrape`:
 
 ```js
 {
@@ -85,7 +85,7 @@ $ curl \
 	-X POST \
 	-H "Content-Type: application/json" \
 	-d '{"url": "http://example.com","hash":"129f2756eac7b62b5b7f428175e5a4e3"}' \
-	http://localhost:8000/scrap \
+	http://localhost:8000/scrape \
 | grep "h1"
 
 <h1>Example Domain</h1>
@@ -114,7 +114,7 @@ $ curl \
 	-X POST \
 	-H "Content-Type: application/json" \
 	-d '{"url": "http://example.com","selector":"h1","hash":"129f2756eac7b62b5b7f428175e5a4e3"}' \
-	http://localhost:8000/scrap \
+	http://localhost:8000/scrape \
 | grep "h1"
 
 <h1>Example Domain</h1>

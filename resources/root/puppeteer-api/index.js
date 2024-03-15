@@ -8,7 +8,7 @@ const packageInfo = require('./package.json');
 
 const uuid4 = require('uuid4');
 const express = require('express');
-const { scrap } = require('./puppeteer');
+const { scrape } = require('./puppeteer');
 const md5 = require('md5');
 const fs = require('fs');
 
@@ -26,14 +26,14 @@ const app = express();
 app.use(express.json());
 
 /**
- * Does the same as `scrap()` but requires `url` to be signed
+ * Does the same as `scrape()` but requires `url` to be signed
  *
  * @param {string} hash md5(`${url}:${SALT}`)
- * @param {string} url See `scrap()`
- * @param {string} selector See `scrap()`
+ * @param {string} url See `scrape()`
+ * @param {string} selector See `scrape()`
  * @return {Promise<string>}
  */
-async function securedScrap({url, selector, hash}, sessionId = "local") {
+async function securedScrape({url, selector, hash}, sessionId = "local") {
     let myStr = `${url}:${SALT}`;
     let myHash = md5(myStr);
 
@@ -42,13 +42,13 @@ async function securedScrap({url, selector, hash}, sessionId = "local") {
         throw 'invalid hash';
     }
 
-    return await scrap({url, selector}, sessionId);
+    return await scrape({url, selector}, sessionId);
 }
 
-app.post('/scrap', (req, res) => {
+app.post('/scrape', (req, res) => {
     let sesionId = uuid4().replace(/-.*/, '');
     console.log(`[${sesionId}]`, `requesting from: ${req.headers['x-forwarded-for'] || req.connection.remoteAddress} to fetch: ${req.body.url}`);
-    securedScrap(req.body, sesionId).then((data) => {
+    securedScrape(req.body, sesionId).then((data) => {
         console.log(`[${sesionId}]`, `sending data with: ${data.length} bytes`);
         res.send(data);
     }).catch((data) => {
@@ -65,5 +65,5 @@ app.get('/status', (req, res) => {
     res.send(response);
 });
 
-app.listen(PORT, () => console.log(`Scrapper API is listening on port: ${PORT}`));
+app.listen(PORT, () => console.log(`Scraper API version ${packageInfo.version} is listening on port: ${PORT}`));
 

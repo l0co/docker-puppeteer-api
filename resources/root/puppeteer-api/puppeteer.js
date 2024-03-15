@@ -1,5 +1,5 @@
 /**
- * Puppeteer scrapper API. Direct call examples are located at the file bottom.
+ * Puppeteer scraper API. Direct call examples are located at the file bottom.
  *
  * @author Lukasz Frankowski
  */
@@ -14,7 +14,7 @@ const program = require('commander');
  * @param {string} selector CSS selector to check if element appeared, if empty is returns immediately after page is loaded
  * @return {Promise<string>} HTML content after element appeared
  */
-async function scrap({url, selector}, sessionId = "local") {
+async function scrape({url, selector}, sessionId = "local") {
 
     return new Promise(async (resolve, reject) => {
 
@@ -88,7 +88,7 @@ async function scrap({url, selector}, sessionId = "local") {
 
 // exports
 
-exports.scrap = scrap;
+exports.scrape = scrape;
 
 // CLI
 
@@ -102,7 +102,7 @@ program
         let req = {url};
         if (cmd.selector)
             req.selector = cmd.selector;
-        console.log(await scrap(req, null));
+        console.log(await scrape(req, null));
     });
 
 
@@ -111,14 +111,14 @@ program.parse(process.argv);
 
 // direct call examples
 
-// scrap({
+// scrape({
 //     url: 'http://example.com/',
 //     selector: 'h1'
 // }).then((content) => {
 //     console.log(content);
 // });
 
-// securedScrap({
+// securedScrape({
 //     url: 'http://example.com/',
 //     selector: 'h1',
 //     hash: 'c020eed4c5703931fb45596bf32fd709'
