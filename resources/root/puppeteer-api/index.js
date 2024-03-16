@@ -33,7 +33,7 @@ app.use(express.json());
  * @param {string} selector See `scrape()`
  * @return {Promise<string>}
  */
-async function securedScrape({url, selector, hash}, sessionId = "local") {
+async function securedScrape({url, selector, hash}, sessionId = "local", returnFullPage = false) {
     let myStr = `${url}:${SALT}`;
     let myHash = md5(myStr);
 
@@ -42,19 +42,34 @@ async function securedScrape({url, selector, hash}, sessionId = "local") {
         throw 'invalid hash';
     }
 
-    return await scrape({url, selector}, sessionId);
+    return await scrape({url, selector}, sessionId, returnFullPage);
 }
 
-app.post('/scrape', (req, res) => {
+async function handleRequest(req, res, returnFullPage = false) {
     let sesionId = uuid4().replace(/-.*/, '');
     console.log(`[${sesionId}]`, `requesting from: ${req.headers['x-forwarded-for'] || req.connection.remoteAddress} to fetch: ${req.body.url}`);
-    securedScrape(req.body, sesionId).then((data) => {
+
+    if (!req.body.selector && !returnFullPage) {
+        console.log(`[${sesionId}]`, `must provide a selector for scraping`);
+        res.status(400).send('must provide a selector for scraping');
+        return;
+    }
+    
+    securedScrape(req.body, sesionId, returnFullPage).then((data) => {
         console.log(`[${sesionId}]`, `sending data with: ${data.length} bytes`);
         res.send(data);
     }).catch((data) => {
         console.log(`[${sesionId}]`, `sending error: ${data}`);
         res.status(400).send(data);
     })
+}
+
+app.post('/scrape', (req, res) => {
+    handleRequest(req, res, false);
+});
+
+app.post('/fetch', (req, res) => {
+    handleRequest(req, res, true);
 });
 
 app.get('/status', (req, res) => {

@@ -16,7 +16,7 @@ const program = require('commander');
  * @param {string} selector CSS selector to check if element appeared, if empty is returns immediately after page is loaded
  * @return {Promise<string>} HTML content after element appeared
  */
-async function scrape({url, selector}, sessionId = "local") {
+async function scrape({url, selector}, sessionId = "local", returnFullPage = false) {
 
     return new Promise(async (resolve, reject) => {
 
@@ -46,7 +46,14 @@ async function scrape({url, selector}, sessionId = "local") {
             let elements = await page.$$(selector);
             if (elements.length) {
                 if (sessionId) console.log(`[${sessionId}]`, `element with selector: '${selector}' appeared, resolving content`);
-                resolve(await page.content());
+                if (returnFullPage) { 
+                    resolve(await page.content());
+                } else {
+                    const elementContents = (await Promise.all(
+                        elements.map(element => page.evaluate(el => el.outerHTML, element))
+                    )).join("\n");
+                    resolve(elementContents);
+                }
                 await stop();
             } else if (++j === 60) { // 60 secs timeout
                 if (sessionId) console.log(`[${sessionId}]`, `element with selector: '${selector}' didn't appear, timeout`);
