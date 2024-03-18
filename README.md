@@ -77,7 +77,7 @@ $ echo -n "http://example.com:abcdef" | md5sum
 129f2756eac7b62b5b7f428175e5a4e3 -
 ```
 
-Having this *signature* you can now ask API for the URL:
+Having this *signature* you can now use the `/fetch` API endopint for the URL:
 
 ```
 $ curl \
@@ -85,7 +85,7 @@ $ curl \
 	-X POST \
 	-H "Content-Type: application/json" \
 	-d '{"url": "http://example.com","hash":"129f2756eac7b62b5b7f428175e5a4e3"}' \
-	http://localhost:8000/scrape \
+	http://localhost:8000/fetch \
 | grep "h1"
 
 <h1>Example Domain</h1>
@@ -106,7 +106,7 @@ $ docker logs puppeteer-api
 
 ##### On element appearance in DOM
 
-In the second mode the API fetches URL content only after element with given [CSS selector](http://htmldog.com/references/css/selectors/) appears in the DOM. This can be done this way (for `h1` selector):
+In the second mode the API returns scraped content content only after element with given [CSS selector](http://htmldog.com/references/css/selectors/) appears in the DOM. This can be done this way using the `/scrape` API endopint (for `h1` selector):
 
 ```
 $ curl \
@@ -114,8 +114,7 @@ $ curl \
 	-X POST \
 	-H "Content-Type: application/json" \
 	-d '{"url": "http://example.com","selector":"h1","hash":"129f2756eac7b62b5b7f428175e5a4e3"}' \
-	http://localhost:8000/scrape \
-| grep "h1"
+	http://localhost:8000/scrape 
 
 <h1>Example Domain</h1>
 ```
@@ -148,7 +147,7 @@ $ docker run --rm -it --entrypoint "/bin/bash" l0coful/puppeteer-api puppeteer f
 On `h1` element appearance in DOM:
 
 ```
-$ docker run --rm -it --entrypoint "/bin/bash" l0coful/puppeteer-api puppeteer fetch -s "h1" http://example.com | grep "h1"
+$ docker run --rm -it --entrypoint "/bin/bash" l0coful/puppeteer-api puppeteer scrape -s "h1" http://example.com
 <h1>Example Domain</h1>
 ```
 
