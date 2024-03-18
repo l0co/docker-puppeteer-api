@@ -106,12 +106,19 @@ program.version(packageInfo.version);
 program
     .command('fetch <url>')
     .description('fetches URL')
+    .action(async function (url, cmd) {
+        let req = {url};
+        console.log(await scrape(req, null, true));
+    });
+
+program
+    .command('scrape <url>')
+    .description('scrapes URL')
     .option('-s, --selector <selector>', 'returns content after appearance of element pointed by css selector')
     .action(async function (url, cmd) {
         let req = {url};
-        if (cmd.selector)
-            req.selector = cmd.selector;
-        console.log(await scrape(req, null));
+        req.selector = cmd.selector;
+        console.log(await scrape(req, null, false));
     });
 
 
