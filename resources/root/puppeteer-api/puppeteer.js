@@ -1,8 +1,10 @@
 /**
- * Puppeteer scrapper API. Direct call examples are located at the file bottom.
+ * Puppeteer scraper API. Direct call examples are located at the file bottom.
  *
  * @author Lukasz Frankowski
  */
+
+const packageInfo = require('./package.json');
 
 const puppeteer = require('puppeteer-core');
 const program = require('commander');
@@ -14,18 +16,21 @@ const program = require('commander');
  * @param {string} selector CSS selector to check if element appeared, if empty is returns immediately after page is loaded
  * @return {Promise<string>} HTML content after element appeared
  */
-async function scrap({url, selector}, sessionId = "local") {
+async function scrape({url, selector}, sessionId = "local", returnFullPage = false) {
 
     return new Promise(async (resolve, reject) => {
 
         if (sessionId) console.log(`[${sessionId}]`, 'starting chrome browser');
         const browser = await puppeteer.launch({
-            executablePath: '/opt/google/chrome/chrome',
+            executablePath: '/usr/bin/chromium-browser',
             args: ['--no-sandbox']
         });
 
         let j = 0;
         const page = await browser.newPage();
+        if (process.env.USER_AGENT) {
+            page.setUserAgent(process.env.USER_AGENT);
+        }
 
         async function stop() {
             if (i) {
@@ -41,7 +46,14 @@ async function scrap({url, selector}, sessionId = "local") {
             let elements = await page.$$(selector);
             if (elements.length) {
                 if (sessionId) console.log(`[${sessionId}]`, `element with selector: '${selector}' appeared, resolving content`);
-                resolve(await page.content());
+                if (returnFullPage) { 
+                    resolve(await page.content());
+                } else {
+                    const elementContents = (await Promise.all(
+                        elements.map(element => page.evaluate(el => el.outerHTML, element))
+                    )).join("\n");
+                    resolve(elementContents);
+                }
                 await stop();
             } else if (++j === 60) { // 60 secs timeout
                 if (sessionId) console.log(`[${sessionId}]`, `element with selector: '${selector}' didn't appear, timeout`);
@@ -85,21 +97,28 @@ async function scrap({url, selector}, sessionId = "local") {
 
 // exports
 
-exports.scrap = scrap;
+exports.scrape = scrape;
 
 // CLI
 
-program.version('1.0.0');
+program.version(packageInfo.version);
 
 program
     .command('fetch <url>')
     .description('fetches URL')
+    .action(async function (url, cmd) {
+        let req = {url};
+        console.log(await scrape(req, null, true));
+    });
+
+program
+    .command('scrape <url>')
+    .description('scrapes URL')
     .option('-s, --selector <selector>', 'returns content after appearance of element pointed by css selector')
     .action(async function (url, cmd) {
         let req = {url};
-        if (cmd.selector)
-            req.selector = cmd.selector;
-        console.log(await scrap(req, null));
+        req.selector = cmd.selector;
+        console.log(await scrape(req, null, false));
     });
 
 
@@ -108,14 +127,14 @@ program.parse(process.argv);
 
 // direct call examples
 
-// scrap({
+// scrape({
 //     url: 'http://example.com/',
 //     selector: 'h1'
 // }).then((content) => {
 //     console.log(content);
 // });
 
-// securedScrap({
+// securedScrape({
 //     url: 'http://example.com/',
 //     selector: 'h1',
 //     hash: 'c020eed4c5703931fb45596bf32fd709'

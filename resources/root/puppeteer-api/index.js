@@ -4,26 +4,36 @@
  * @author Lukasz Frankowski
  */
 
+const packageInfo = require('./package.json');
+
 const uuid4 = require('uuid4');
 const express = require('express');
-const { scrap } = require('./puppeteer');
+const { scrape } = require('./puppeteer');
 const md5 = require('md5');
+const fs = require('fs');
 
-const SALT = process.env.SALT || "NO-SALT";
+var SALT;
+if (process.env.SALT || process.env.SALT_FILE) {
+    SALT = process.env.SALT || fs.readFileSync(process.env.SALT_FILE, 'utf8');
+    console.log(`Using '${SALT}' as salt`);
+} else {
+    SALT = "NO-SALT";
+    console.warn(`Warning: using default '${SALT}' salt, you should provide some randomly generated string as SALT environment variable`);
+}
 const PORT = 8000;
 
 const app = express();
 app.use(express.json());
 
 /**
- * Does the same as `scrap()` but requires `url` to be signed
+ * Does the same as `scrape()` but requires `url` to be signed
  *
  * @param {string} hash md5(`${url}:${SALT}`)
- * @param {string} url See `scrap()`
- * @param {string} selector See `scrap()`
+ * @param {string} url See `scrape()`
+ * @param {string} selector See `scrape()`
  * @return {Promise<string>}
  */
-async function securedScrap({url, selector, hash}, sessionId = "local") {
+async function securedScrape({url, selector, hash}, sessionId = "local", returnFullPage = false) {
     let myStr = `${url}:${SALT}`;
     let myHash = md5(myStr);
 
@@ -32,25 +42,43 @@ async function securedScrap({url, selector, hash}, sessionId = "local") {
         throw 'invalid hash';
     }
 
-    return await scrap({url, selector}, sessionId);
+    return await scrape({url, selector}, sessionId, returnFullPage);
 }
 
-app.post('/scrap', (req, res) => {
+async function handleRequest(req, res, returnFullPage = false) {
     let sesionId = uuid4().replace(/-.*/, '');
     console.log(`[${sesionId}]`, `requesting from: ${req.headers['x-forwarded-for'] || req.connection.remoteAddress} to fetch: ${req.body.url}`);
-    securedScrap(req.body, sesionId).then((data) => {
+
+    if (!req.body.selector && !returnFullPage) {
+        console.log(`[${sesionId}]`, `must provide a selector for scraping`);
+        res.status(400).send('must provide a selector for scraping');
+        return;
+    }
+    
+    securedScrape(req.body, sesionId, returnFullPage).then((data) => {
         console.log(`[${sesionId}]`, `sending data with: ${data.length} bytes`);
         res.send(data);
     }).catch((data) => {
         console.log(`[${sesionId}]`, `sending error: ${data}`);
         res.status(400).send(data);
     })
+}
+
+app.post('/scrape', (req, res) => {
+    handleRequest(req, res, false);
 });
 
-if (SALT === "NO-SALT")
-    console.warn("Warning: using default 'NO_SALT' salt, you should provide some randomly generated string as SALT environment variable");
-else
-    console.log(`Using '${SALT}' as salt`);
+app.post('/fetch', (req, res) => {
+    handleRequest(req, res, true);
+});
 
-app.listen(PORT, () => console.log(`Scrapper API is listening on port: ${PORT}`));
+app.get('/status', (req, res) => {
+    let response = {
+        "status": "OK",
+        "version": packageInfo.version
+    };
+    res.send(response);
+});
+
+app.listen(PORT, () => console.log(`Scraper API version ${packageInfo.version} is listening on port: ${PORT}`));
 
