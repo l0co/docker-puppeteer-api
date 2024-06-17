@@ -151,6 +151,47 @@ $ docker run --rm -it --entrypoint "/bin/bash" l0coful/puppeteer-api puppeteer s
 <h1>Example Domain</h1>
 ```
 
+### Go Client Library
+
+https://sneak.berlin/go/puppeteerapiclient
+
+```go
+package main
+
+import (
+	"context"
+	"fmt"
+	"log"
+	"os"
+	"time"
+
+	_ "github.com/joho/godotenv/autoload"
+	"sneak.berlin/go/puppeteerapiclient"
+)
+
+const url = "https://news.ycombinator.com"
+const selector = ".athing .title .titleline"
+
+func main() {
+	apiURL := os.Getenv("API_URL")
+	apiSalt := os.Getenv("API_SALT")
+
+	client := puppeteerapiclient.NewClient(apiURL, apiSalt)
+
+	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
+
+	defer cancel()
+
+	response, err := client.Scrape(ctx, url, selector)
+
+	if err != nil {
+		log.Fatal(err)
+	}
+	fmt.Println(response.Content)
+}
+```
+
+
 
 ## How to build
 
