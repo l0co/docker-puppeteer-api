@@ -44,21 +44,36 @@ async function scrape({url, selector}, sessionId = "local", returnFullPage = fal
         }
 
         async function check() {
-            let elements = await page.$$(selector);
-            if (elements.length) {
-                if (sessionId) console.log(`[${sessionId}]`, `element with selector: '${selector}' appeared, resolving content`);
-                if (returnFullPage) { 
-                    resolve(await page.content());
-                } else {
-                    const elementContents = (await Promise.all(
-                        elements.map(element => page.evaluate(el => el.outerHTML, element))
-                    )).join("\n");
-                    resolve(elementContents);
+            try {
+                let elements = await page.$$(selector);
+                if (elements.length) {
+                    if (sessionId) console.log(`[${sessionId}]`, `element with selector: '${selector}' appeared, resolving content`);
+                    if (returnFullPage) {
+                        resolve(await page.content());
+                    } else {
+                        // received a lot of fatal errors trying to access closed pages:
+                        // Error: Protocol error (Runtime.callFunctionOn): Target closed.
+                        // see https://stackoverflow.com/a/73334739
+                        // the method below seems to circumvent this problem
+                        const elementContentsList = [];
+                        await elements.reduce(
+                            async (item, element) => {
+                                await item;
+                                elementContentsList.push(await page.evaluate(el => el.outerHTML, element));
+                            },
+                            Promise.resolve()
+                        );
+                        resolve(elementContentsList.join("\n"));
+                    }
+                    await stop();
+                } else if (++j === 60) { // 60 secs timeout
+                    if (sessionId) console.log(`[${sessionId}]`, `element with selector: '${selector}' didn't appear, timeout`);
+                    reject('element timeout');
+                    await stop();
                 }
-                await stop();
-            } else if (++j === 60) { // 60 secs timeout
-                if (sessionId) console.log(`[${sessionId}]`, `element with selector: '${selector}' didn't appear, timeout`);
-                reject('element timeout');
+            } catch(e) {
+                if (sessionId) console.error(`[${sessionId}]`, `puppeteer error: ${e.message}`);
+                reject(`puppeteer error: ${e.message}`);
                 await stop();
             }
 
