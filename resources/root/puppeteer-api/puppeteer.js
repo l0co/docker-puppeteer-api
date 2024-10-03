@@ -87,10 +87,10 @@ async function scrape({url, selector}, sessionId = "local", returnFullPage = fal
             }
 
             if (selector) {
-                if (sessionId) console.log(`[${sessionId}]`, `page loaded, setting 1000 ms refresh interval`);
+                if (sessionId) console.log(`[${sessionId}]`, `page loaded; looking for selector: '${selector}'. setting 1000 ms refresh interval`);
                 i = setInterval(check, 1000);
             } else {
-                if (sessionId) console.log(`[${sessionId}]`, `page loaded, resolving content immediately`);
+                if (sessionId) console.log(`[${sessionId}]`, `page loaded; resolving content immediately`);
                 resolve(await page.content());
                 await stop();
             }
