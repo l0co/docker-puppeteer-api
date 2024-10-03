@@ -39,7 +39,7 @@ async function securedScrape({url, selector, hash}, sessionId = "local", returnF
 
     if (hash !== myHash) {
         console.debug(`[${sessionId}]`, `invalid provided hash: ${hash}, while a proper one is: ${myHash} build from: "${myStr}"`);
-        throw 'invalid hash';
+        throw [401, 'invalid hash'];
     }
 
     return await scrape({url, selector}, sessionId, returnFullPage);
@@ -54,13 +54,13 @@ async function handleRequest(req, res, returnFullPage = false) {
         res.status(400).send('must provide a selector for scraping');
         return;
     }
-    
+
     securedScrape(req.body, sesionId, returnFullPage).then((data) => {
         console.log(`[${sesionId}]`, `sending data with: ${data.length} bytes`);
         res.send(data);
     }).catch((data) => {
-        console.log(`[${sesionId}]`, `sending error: ${data}`);
-        res.status(400).send(data);
+        console.log(`[${sesionId}]`, `sending error ${data[0]}: ${data[1]}`);
+        res.status(data[0]).send(data[1]);
     })
 }
 

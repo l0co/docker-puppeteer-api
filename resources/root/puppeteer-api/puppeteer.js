@@ -68,12 +68,12 @@ async function scrape({url, selector}, sessionId = "local", returnFullPage = fal
                     await stop();
                 } else if (++j === 60) { // 60 secs timeout
                     if (sessionId) console.log(`[${sessionId}]`, `element with selector: '${selector}' didn't appear, timeout`);
-                    reject('element timeout');
+                    reject([404, 'didn\'t appear']);
                     await stop();
                 }
             } catch(e) {
                 if (sessionId) console.error(`[${sessionId}]`, `puppeteer error: ${e.message}`);
-                reject(`puppeteer error: ${e.message}`);
+                reject([500, `puppeteer error: ${e.message}`]);
                 await stop();
             }
 
@@ -102,7 +102,7 @@ async function scrape({url, selector}, sessionId = "local", returnFullPage = fal
         } catch (e) {
             if (sessionId) console.error(`[${sessionId}]`, `error: ${e.message}, but continue to wait for onload yet another time`);
             k = setTimeout(async () => {
-                reject('pageload timeout');
+                reject([503, 'pageload timeout']);
                 await stop();
             }, 30000);
         }
