@@ -21,9 +21,10 @@ async function scrape({url, selector}, sessionId = "local", returnFullPage = fal
     return new Promise(async (resolve, reject) => {
 
         if (sessionId) console.log(`[${sessionId}]`, 'starting chrome browser');
+        // see https://github.com/puppeteer/puppeteer/issues/1793#issuecomment-438971272
         const browser = await puppeteer.launch({
             executablePath: '/usr/bin/chromium-browser',
-            args: ['--no-sandbox']
+            args: ['--no-sandbox', '--disable-gpu']
         });
 
         let j = 0;
