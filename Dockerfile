@@ -1,7 +1,7 @@
 FROM alpine:3.19.1
 
-ENV IMAGE_NAME puppeteer-api
-ENV IMAGE_VERSION 2.0
+ENV IMAGE_NAME=puppeteer-api
+ENV IMAGE_VERSION=2.0
 LABEL docker.image.name=$IMAGE_NAME
 LABEL image.version=$IMAGE_VERSION
 STOPSIGNAL SIGTERM
