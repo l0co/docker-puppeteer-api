@@ -13,7 +13,7 @@ services_init() {
 
 services_start() {
     echo "Starting services..."
-    service ssh start
+    #service ssh start
     if [ -f /bootstrap-start.sh ]; then
         /bootstrap-start.sh "$@"
     fi
@@ -21,7 +21,7 @@ services_start() {
 
 services_stop() {
     echo "Stopping services..."
-    service ssh stop
+    #service ssh stop
     if [ -f /bootstrap-stop.sh ]; then
         /bootstrap-stop.sh "$@"
     fi
