@@ -55,19 +55,10 @@ async function scrape({url, selector}, sessionId = "local", returnFullPage = fal
                         if (returnFullPage) {
                             resolve(await page.content());
                         } else {
-                            // received a lot of fatal errors trying to access closed pages:
-                            // Error: Protocol error (Runtime.callFunctionOn): Target closed.
-                            // see https://stackoverflow.com/a/73334739
-                            // the method below seems to circumvent this problem
-                            const elementContentsList = [];
-                            await elements.reduce(
-                                async (item, element) => {
-                                    await item;
-                                    elementContentsList.push(await page.evaluate(el => el.outerHTML, element));
-                                },
-                                Promise.resolve()
-                            );
-                            resolve(elementContentsList.join("\n"));
+                            const elementContents = (await Promise.all(
+                              elements.map(element => page.evaluate(el => el.outerHTML, element))
+                            )).join("\n");
+                            resolve(elementContents);
                         }
                         await stop();
                     } else if (++j === 60) { // 60 secs timeout
