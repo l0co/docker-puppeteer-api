@@ -48,30 +48,23 @@ async function scrape({url, selector}, sessionId = "local", returnFullPage = fal
             }
 
             async function check() {
-                try {
-                    let elements = await page.$$(selector);
-                    if (elements.length) {
-                        if (sessionId) console.log(`[${sessionId}]`, `element with selector: '${selector}' appeared, resolving content`);
-                        if (returnFullPage) {
-                            resolve(await page.content());
-                        } else {
-                            const elementContents = (await Promise.all(
-                              elements.map(element => page.evaluate(el => el.outerHTML, element))
-                            )).join("\n");
-                            resolve(elementContents);
-                        }
-                        await stop();
-                    } else if (++j === 60) { // 60 secs timeout
-                        if (sessionId) console.log(`[${sessionId}]`, `element with selector: '${selector}' didn't appear, timeout`);
-                        reject([404, 'didn\'t appear']);
-                        await stop();
+                let elements = await page.$$(selector);
+                if (elements.length) {
+                    if (sessionId) console.log(`[${sessionId}]`, `element with selector: '${selector}' appeared, resolving content`);
+                    if (returnFullPage) {
+                        resolve(await page.content());
+                    } else {
+                        const elementContents = (await Promise.all(
+                          elements.map(element => page.evaluate(el => el.outerHTML, element))
+                        )).join("\n");
+                        resolve(elementContents);
                     }
-                } catch(e) {
-                    console.error(`[${sessionId}]`, `puppeteer error: ${e.message}`);
-                    reject([500, `puppeteer error: ${e.message}`]);
+                    await stop();
+                } else if (++j === 60) { // 60 secs timeout
+                    if (sessionId) console.log(`[${sessionId}]`, `element with selector: '${selector}' didn't appear, timeout`);
+                    reject([404, 'didn\'t appear']);
                     await stop();
                 }
-
             }
 
             let i = null, k = null;
