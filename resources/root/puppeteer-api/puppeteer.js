@@ -27,7 +27,7 @@ async function scrape({ url, selector, proxy }, sessionId = "local", returnFullP
             }
             // see https://github.com/puppeteer/puppeteer/issues/1793#issuecomment-438971272
             const browser = await puppeteer.launch({
-                executablePath: '/usr/bin/chromium',
+                executablePath: '/usr/bin/chromium-browser',
                 args
             });
 
