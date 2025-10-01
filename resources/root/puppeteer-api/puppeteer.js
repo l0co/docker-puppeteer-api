@@ -22,9 +22,8 @@ async function scrape({ url, selector, proxy }, sessionId = "local", returnFullP
         try {
             if (sessionId) console.log(`[${sessionId}]`, 'starting chrome browser');
             const args = ['--no-sandbox', '--disable-gpu'];
-            if (proxy) {
-              args.push(`--proxy-server=${proxy}`)
-            }
+            if (proxy) args.push(`--proxy-server=${proxy}`)
+            
             // see https://github.com/puppeteer/puppeteer/issues/1793#issuecomment-438971272
             const browser = await puppeteer.launch({
                 executablePath: '/usr/bin/chromium-browser',
