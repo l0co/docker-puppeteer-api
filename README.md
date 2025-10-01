@@ -51,7 +51,8 @@ POST following JSON to `http://localhost:8000/scrape`:
 {
 	"url": "http://example.com",
 	"selector": "h1",
-	"hash": "129f2756eac7b62b5b7f428175e5a4e3"
+	"hash": "129f2756eac7b62b5b7f428175e5a4e3",
+	"proxy": "http://localhost:8081"
 }
 ```
 
@@ -60,6 +61,7 @@ Where:
 1. `url` is the URL to fetch.
 1. `selector` is an optional selector. If provided the content will be returned only after this selector returns non-empty elements array. Otherwise the content will be returned on page `onload` event.
 1. `hash` is the request signature done by ``md5(`${url}:${SALT}`)``.
+1. `proxy` is an optional argument to launch chromium with the `--proxy-server` flag
 
 ##### On page load
 
