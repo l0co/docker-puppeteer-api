@@ -33,7 +33,7 @@ app.use(express.json());
  * @param {string} selector See `scrape()`
  * @return {Promise<string>}
  */
-async function securedScrape({url, selector, hash}, sessionId = "local", returnFullPage = false) {
+ async function securedScrape({ url, selector, hash, proxy }, sessionId = "local", returnFullPage = false) {
     let myStr = `${url}:${SALT}`;
     let myHash = md5(myStr);
 
@@ -42,7 +42,7 @@ async function securedScrape({url, selector, hash}, sessionId = "local", returnF
         throw [401, 'invalid hash'];
     }
 
-    return await scrape({url, selector}, sessionId, returnFullPage);
+    return await scrape({ url, selector, proxy }, sessionId, returnFullPage);
 }
 
 async function handleRequest(req, res, returnFullPage = false) {
@@ -81,4 +81,3 @@ app.get('/status', (req, res) => {
 });
 
 app.listen(PORT, () => console.log(`Scraper API version ${packageInfo.version} is listening on port: ${PORT}`));
-
