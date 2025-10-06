@@ -16,15 +16,18 @@ const program = require('commander');
  * @param {string} selector CSS selector to check if element appeared, if empty is returns immediately after page is loaded
  * @return {Promise<string>} HTML content after element appeared
  */
-async function scrape({url, selector}, sessionId = "local", returnFullPage = false) {
+async function scrape({ url, selector, proxy }, sessionId = "local", returnFullPage = false) {
 
     return new Promise(async (resolve, reject) => {
         try {
             if (sessionId) console.log(`[${sessionId}]`, 'starting chrome browser');
+            const args = ['--no-sandbox', '--disable-gpu'];
+            if (proxy) args.push(`--proxy-server=${proxy}`)
+            
             // see https://github.com/puppeteer/puppeteer/issues/1793#issuecomment-438971272
             const browser = await puppeteer.launch({
                 executablePath: '/usr/bin/chromium-browser',
-                args: ['--no-sandbox', '--disable-gpu']
+                args
             });
 
             let j = 0;
